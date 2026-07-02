@@ -1,7 +1,26 @@
 .env
+
 common/futbol_mensajes_pb2_grpc.py
 common/futbol_mensajes_pb2.py
 common/__pycache__/
 productor/__pycache__/
 productor/variables/__pycache__/
 **/__pycache__/
+=======
+# Entorno virtual
+venv/
+
+# Cache de Python
+__pycache__/
+*.pyc
+
+# Base de datos
+db.sqlite3
+
+# Variables de entorno
+.env
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
