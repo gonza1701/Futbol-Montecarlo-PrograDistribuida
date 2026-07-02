@@ -1,0 +1,194 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Montecarlo · Fútbol</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- CSS separado -->
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+</head>
+<body>
+    <div class="dashboard">
+
+        <!-- HEADER -->
+        <header class="header">
+            <h1><i class="fas fa-futbol"></i> Dashboard Montecarlo</h1>
+            <div class="badge-status">
+                <span class="dot"></span>
+                <span>En vivo · RabbitMQ</span>
+                <i class="fas fa-rotate-right"></i>
+            </div>
+        </header>
+
+        <!-- KPI TARJETAS -->
+        <section class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-left">
+                    <span class="kpi-label"><i class="fas fa-calendar-alt"></i> Partidos</span>
+                    <span class="kpi-value" id="partidos">10,235</span>
+                </div>
+                <div class="kpi-icon"><i class="fas fa-trophy"></i></div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-left">
+                    <span class="kpi-label"><i class="fas fa-check-circle"></i> Victorias local</span>
+                    <span class="kpi-value" id="victorias">6,830</span>
+                </div>
+                <div class="kpi-icon"><i class="fas fa-home"></i></div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-left">
+                    <span class="kpi-label"><i class="fas fa-percentage"></i> Probabilidad</span>
+                    <span class="kpi-value" id="probabilidad">66.75<small>%</small></span>
+                </div>
+                <div class="kpi-icon"><i class="fas fa-chart-line"></i></div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-left">
+                    <span class="kpi-label"><i class="fas fa-tachometer-alt"></i> Throughput</span>
+                    <span class="kpi-value" id="throughput">255<small>/s</small></span>
+                </div>
+                <div class="kpi-icon"><i class="fas fa-rocket"></i></div>
+            </div>
+        </section>
+
+        <!-- FILA 1: GRÁFICAS - 50% / 50% -->
+        <section class="charts-row">
+            <!-- Gráfica 1: Convergencia -->
+            <div class="chart-box chart-half">
+                <div class="chart-header">
+                    <span><i class="fas fa-wave-square"></i> Convergencia · Montecarlo</span>
+                    <span class="chart-badge">últimos 100</span>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="convergenciaChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Gráfica 2: Throughput -->
+            <div class="chart-box chart-half">
+                <div class="chart-header">
+                    <span><i class="fas fa-microchip"></i> Throughput por componente</span>
+                    <span class="chart-badge">ms</span>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="throughputChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- FILA 2: PASTEL + CONSUMIDORES + RESULTADOS -->
+        <section class="bottom-row-three">
+            <!-- Gráfica de Pastel -->
+            <div class="chart-box pie-box">
+                <div class="chart-header">
+                    <span><i class="fas fa-chart-pie"></i> Distribución</span>
+                    <span class="chart-badge">1000 partidos</span>
+                </div>
+                <div class="chart-wrapper-pie">
+                    <canvas id="pieChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Consumidores -->
+            <div class="consumidores-box">
+                <div class="chart-header">
+                    <span><i class="fas fa-users"></i> Consumidores</span>
+                    <span class="chart-badge">activos</span>
+                </div>
+                <div class="consumidor-lista">
+                    <div class="consumidor-item">
+                        <span class="consumidor-nombre consumidor-1">
+                            <i class="fas fa-circle"></i> Consumidor 1
+                        </span>
+                        <div class="bar-wrapper">
+                            <div class="bar-fill bar-1" style="width: 78%;"></div>
+                            <span class="bar-label">5,120</span>
+                        </div>
+                    </div>
+                    <div class="consumidor-item">
+                        <span class="consumidor-nombre consumidor-2">
+                            <i class="fas fa-circle"></i> Consumidor 2
+                        </span>
+                        <div class="bar-wrapper">
+                            <div class="bar-fill bar-2" style="width: 74%;"></div>
+                            <span class="bar-label">5,115</span>
+                        </div>
+                    </div>
+                    <div class="consumidor-item">
+                        <span class="consumidor-nombre consumidor-3">
+                            <i class="fas fa-circle"></i> Consumidor 3
+                        </span>
+                        <div class="bar-wrapper">
+                            <div class="bar-fill bar-3" style="width: 45%;"></div>
+                            <span class="bar-label">3,020</span>
+                        </div>
+                    </div>
+                    <div class="consumidor-item">
+                        <span class="consumidor-nombre consumidor-4">
+                            <i class="fas fa-circle"></i> Consumidor 4
+                        </span>
+                        <div class="bar-wrapper">
+                            <div class="bar-fill bar-4" style="width: 62%;"></div>
+                            <span class="bar-label">4,250</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="consumidor-footer">
+                    <i class="fas fa-database"></i> Total procesados: 13,255
+                </div>
+            </div>
+
+            <!-- Últimos resultados -->
+            <div class="resultados-box">
+                <div class="chart-header">
+                    <span><i class="fas fa-list-ul"></i> Últimos resultados</span>
+                    <span class="chart-badge">en tiempo real</span>
+                </div>
+                <div class="tabla-resultados">
+                    <div class="resultado-fila">
+                        <span class="res-id">#4582</span>
+                        <span class="res-marcador">2-1</span>
+                        <span class="res-resultado local">Local</span>
+                    </div>
+                    <div class="resultado-fila">
+                        <span class="res-id">#4583</span>
+                        <span class="res-marcador">0-2</span>
+                        <span class="res-resultado visitante">Visitante</span>
+                    </div>
+                    <div class="resultado-fila">
+                        <span class="res-id">#4584</span>
+                        <span class="res-marcador">1-1</span>
+                        <span class="res-resultado empate">Empate</span>
+                    </div>
+                    <div class="resultado-fila">
+                        <span class="res-id">#4585</span>
+                        <span class="res-marcador">3-1</span>
+                        <span class="res-resultado local">Local</span>
+                    </div>
+                    <div class="resultado-fila">
+                        <span class="res-id">#4586</span>
+                        <span class="res-marcador">2-2</span>
+                        <span class="res-resultado empate">Empate</span>
+                    </div>
+                </div>
+                <div class="resultado-footer">
+                    <i class="fas fa-sync-alt"></i> actualizado: 14:32
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="footer">
+            <i class="fas fa-robot"></i> Simulación Montecarlo · predicción fútbol · datos en tiempo real
+        </footer>
+    </div>
+
+    <script src="{% static 'js/dashboard.js' %}"></script>
+</body>
+</html>
