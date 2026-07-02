@@ -1,0 +1,26 @@
+services:
+  rabbitmq_simulador:
+    image: rabbitmq:3-management-alpine
+    container_name: broker_montecarlo
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 5s
+      timeout: 10s
+      retries: 5
+
+  productor:
+    build:
+      context: .
+      dockerfile: Dockerfile.productor
+    container_name: productor_simulacion
+    environment:
+      - RABBITMQ_HOST=rabbitmq_simulador
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USER=guest
+      - RABBITMQ_PASS=guest
+    depends_on:
+      rabbitmq_simulador:
+        condition: service_healthy
