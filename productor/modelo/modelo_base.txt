@@ -1,0 +1,6 @@
+# Formato: nombre_variable,distribucion,parametro1,parametro2
+t_gol_local,exponencial,0.05
+t_gol_visitante,exponencial,0.04
+rendimiento_local,normal,70,10
+rendimiento_visitante,normal,65,10
+factor_var,uniforme,-1,1
