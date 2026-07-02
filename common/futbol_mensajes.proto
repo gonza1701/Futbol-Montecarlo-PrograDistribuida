@@ -1,0 +1,43 @@
+// futbol_mensajes.proto 
+syntax = "proto3"; 
+ 
+message VariableAleatoria { 
+  string nombre = 1; 
+  oneof distribucion { 
+    Exponencial exponencial = 2; 
+    Normal normal           = 3; 
+    Uniforme uniforme       = 4; 
+  } 
+} 
+message Exponencial { double lambda = 1; } 
+message Normal      { double mu = 1; double sigma = 2; } 
+message Uniforme    { double min = 1; double max = 2; } 
+ 
+message ModeloFutbol { 
+  string id_modelo = 1; 
+  repeated VariableAleatoria variables = 2; 
+  string formula_evaluacion = 3;   // referencia a la función registrada 
+} 
+ 
+message EscenarioPartido { 
+  string id_escenario   = 1; 
+  double t_gol_local     = 2; 
+  double t_gol_visitante = 3; 
+  double rendimiento_local    = 4; 
+  double rendimiento_visitante = 5; 
+  double factor_var      = 6; 
+} 
+ 
+message ResultadoPartido { 
+  string id_escenario = 1; 
+  bool   gana_local   = 2; 
+  int32  goles_local     = 3; 
+  int32  goles_visitante = 4; 
+} 
+ 
+message EventoEstadistica { 
+  string origen = 1;      // "productor" | "consumidor-1" | ... 
+  double tasa_por_segundo = 2; 
+  double probabilidad_victoria_local_acumulada = 3; 
+  int64  escenarios_procesados = 4; 
+} 
