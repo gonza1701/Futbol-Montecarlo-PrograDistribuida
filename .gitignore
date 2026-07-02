@@ -4,3 +4,4 @@ common/futbol_mensajes_pb2.py
 common/__pycache__/
 productor/__pycache__/
 productor/variables/__pycache__/
+**/__pycache__/
