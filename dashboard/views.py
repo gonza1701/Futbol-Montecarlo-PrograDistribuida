@@ -11,12 +11,12 @@ def dashboard_api(request):
     data = cache.get("dashboard_data", {
         "partidos": 0,
         "victorias_local": 0,
-        "probabilidad": 0,
         "throughput": 0,
-        "convergencia": [],
         "throughput_componentes": [0, 0, 0, 0],
         "distribucion": [0, 0, 0],
+        "convergencia_local": [],
+        "convergencia_visita": [],
+        "convergencia_empate": [],
         "ultimos_resultados": []
     })
-
     return JsonResponse(data)

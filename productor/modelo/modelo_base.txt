@@ -1,6 +1,10 @@
 # Formato: nombre_variable,distribucion,parametro1,parametro2
-t_gol_local,exponencial,0.05
-t_gol_visitante,exponencial,0.04
-rendimiento_local,normal,70,10
-rendimiento_visitante,normal,65,10
+# Puebla (Local) - Expectativa de 1.1 goles por partido
+t_gol_local,normal,1.1,0.3
+# Monterrey (Visitante) - Expectativa de 1.8 goles por partido (Favorito)
+t_gol_visitante,normal,1.8,0.4
+# Rendimiento anímico/físico (0 a 100)
+rendimiento_local,normal,68,8
+rendimiento_visitante,normal,78,8
+# Factor VAR y arbitraje
 factor_var,uniforme,-1,1

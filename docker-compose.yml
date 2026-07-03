@@ -24,3 +24,47 @@ services:
     depends_on:
       rabbitmq_simulador:
         condition: service_healthy
+
+  consumidor_1:
+    build:
+      context: .
+      dockerfile: Dockerfile.consumidor
+    environment:
+      - RABBITMQ_HOST=rabbitmq_simulador
+      - CONSUMIDOR_ID=consumidor-1
+    depends_on:
+      rabbitmq_simulador:
+        condition: service_healthy
+
+  consumidor_2:
+    build:
+      context: .
+      dockerfile: Dockerfile.consumidor
+    environment:
+      - RABBITMQ_HOST=rabbitmq_simulador
+      - CONSUMIDOR_ID=consumidor-2
+    depends_on:
+      rabbitmq_simulador:
+        condition: service_healthy
+
+  consumidor_3:
+    build:
+      context: .
+      dockerfile: Dockerfile.consumidor
+    environment:
+      - RABBITMQ_HOST=rabbitmq_simulador
+      - CONSUMIDOR_ID=consumidor-3
+    depends_on:
+      rabbitmq_simulador:
+        condition: service_healthy
+
+  consumidor_4:
+    build:
+      context: .
+      dockerfile: Dockerfile.consumidor
+    environment:
+      - RABBITMQ_HOST=rabbitmq_simulador
+      - CONSUMIDOR_ID=consumidor-4
+    depends_on:
+      rabbitmq_simulador:
+        condition: service_healthy

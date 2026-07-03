@@ -24,16 +24,17 @@ def simular_proceso_poisson(tasa_por_minuto, minutos=MINUTOS_PARTIDO):
 
 
 def evaluar_montecarlo_basico(escenario_pb):
-    t_gol_local = max(escenario_pb.t_gol_local, _EPS)
-    t_gol_visitante = max(escenario_pb.t_gol_visitante, _EPS)
-    # El rendimiento es un porcentaje animico/fisico; se acota a >= 0
-    # por si la Normal(70,10) muestrea un valor extremo poco realista.
+    # Asumimos que t_gol es la expectativa de goles por partido (ej. 1.5)
+    expectativa_local = max(escenario_pb.t_gol_local, _EPS)
+    expectativa_visitante = max(escenario_pb.t_gol_visitante, _EPS)
+    
     rendimiento_local = max(escenario_pb.rendimiento_local, 0.0)
     rendimiento_visitante = max(escenario_pb.rendimiento_visitante, 0.0)
-    factor_var = escenario_pb.factor_var  #acotado en [-1, 1]
+    factor_var = escenario_pb.factor_var  # acotado en [-1, 1]
 
-    tasa_local = (1 / t_gol_local) * (rendimiento_local / 70) * (1 + 0.05 * factor_var)
-    tasa_visitante = (1 / t_gol_visitante) * (rendimiento_visitante / 70) * (1 - 0.05 * factor_var)
+    # Convertimos la expectativa del partido entero a una tasa por minuto
+    tasa_local = (expectativa_local / MINUTOS_PARTIDO) * (rendimiento_local / 70) * (1 + 0.05 * factor_var)
+    tasa_visitante = (expectativa_visitante / MINUTOS_PARTIDO) * (rendimiento_visitante / 70) * (1 - 0.05 * factor_var)
 
     goles_local = simular_proceso_poisson(tasa_local, MINUTOS_PARTIDO)
     goles_visitante = simular_proceso_poisson(tasa_visitante, MINUTOS_PARTIDO)

@@ -89,7 +89,7 @@ class Consumidor:
         transcurrido = ahora - self._inicio_ventana
         tasa_por_segundo = self._procesados_ventana / transcurrido if transcurrido > 0 else 0.0
         prob_local_acumulada = (
-            self.victorias_local / self.escenarios_procesados
+            (self.victorias_local / self.escenarios_procesados)*100
             if self.escenarios_procesados else 0.0
         )
 
