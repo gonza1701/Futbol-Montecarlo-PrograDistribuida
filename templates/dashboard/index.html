@@ -115,91 +115,35 @@
         </div>
 
         <!-- Consumidores -->
-        <div class="consumidores-box">
-          <div class="chart-header">
-            <span><i class="fas fa-users"></i> Consumidores</span>
-            <span class="chart-badge">activos</span>
-          </div>
-          <div class="consumidor-lista">
-            <div class="consumidor-item">
-              <span class="consumidor-nombre consumidor-1">
-                <i class="fas fa-circle"></i> Consumidor 1
-              </span>
-              <div class="bar-wrapper">
-                <div class="bar-fill bar-1" style="width: 78%"></div>
-                <span class="bar-label">5,120</span>
-              </div>
-            </div>
-            <div class="consumidor-item">
-              <span class="consumidor-nombre consumidor-2">
-                <i class="fas fa-circle"></i> Consumidor 2
-              </span>
-              <div class="bar-wrapper">
-                <div class="bar-fill bar-2" style="width: 74%"></div>
-                <span class="bar-label">5,115</span>
-              </div>
-            </div>
-            <div class="consumidor-item">
-              <span class="consumidor-nombre consumidor-3">
-                <i class="fas fa-circle"></i> Consumidor 3
-              </span>
-              <div class="bar-wrapper">
-                <div class="bar-fill bar-3" style="width: 45%"></div>
-                <span class="bar-label">3,020</span>
-              </div>
-            </div>
-            <div class="consumidor-item">
-              <span class="consumidor-nombre consumidor-4">
-                <i class="fas fa-circle"></i> Consumidor 4
-              </span>
-              <div class="bar-wrapper">
-                <div class="bar-fill bar-4" style="width: 62%"></div>
-                <span class="bar-label">4,250</span>
-              </div>
-            </div>
-          </div>
-          <div class="consumidor-footer">
-            <i class="fas fa-database"></i> Total procesados: 13,255
-          </div>
+      <div class="consumidores-box">
+        <div class="chart-header">
+          <span><i class="fas fa-users"></i> Consumidores</span>
+          <span class="chart-badge">activos</span>
         </div>
 
-        <!-- Últimos resultados -->
-        <div class="resultados-box">
-          <div class="chart-header">
-            <span><i class="fas fa-list-ul"></i> Últimos resultados</span>
-            <span class="chart-badge">en tiempo real</span>
-          </div>
-          <div class="tabla-resultados">
-            <div class="resultado-fila">
-              <span class="res-id">#4582</span>
-              <span class="res-marcador">2-1</span>
-              <span class="res-resultado local">Local</span>
-            </div>
-            <div class="resultado-fila">
-              <span class="res-id">#4583</span>
-              <span class="res-marcador">0-2</span>
-              <span class="res-resultado visitante">Visitante</span>
-            </div>
-            <div class="resultado-fila">
-              <span class="res-id">#4584</span>
-              <span class="res-marcador">1-1</span>
-              <span class="res-resultado empate">Empate</span>
-            </div>
-            <div class="resultado-fila">
-              <span class="res-id">#4585</span>
-              <span class="res-marcador">3-1</span>
-              <span class="res-resultado local">Local</span>
-            </div>
-            <div class="resultado-fila">
-              <span class="res-id">#4586</span>
-              <span class="res-marcador">2-2</span>
-              <span class="res-resultado empate">Empate</span>
-            </div>
-          </div>
-          <div class="resultado-footer">
-            <i class="fas fa-sync-alt"></i> actualizado: 14:32
-          </div>
+        <div class="consumidor-lista" id="consumidor-lista">
+          <!-- Se llenará dinámicamente con JavaScript -->
         </div>
+
+        <div class="consumidor-footer">
+          <i class="fas fa-database"></i>
+          Total procesados: <span id="total-procesados">0</span>
+        </div>
+      </div>
+
+      <!-- Últimos resultados -->
+      <div class="resultados-box">
+        <div class="chart-header">
+          <span><i class="fas fa-list-ul"></i> Últimos resultados</span>
+          <span class="chart-badge">en tiempo real</span>
+        </div>
+        <div class="tabla-resultados" id="tabla-resultados">
+          <!-- Se llenará dinámicamente con JavaScript -->
+        </div>
+        <div class="resultado-footer">
+          <i class="fas fa-sync-alt"></i> actualizado: <span id="ultima-actualizacion">--:--</span>
+        </div>
+      </div>
       </section>
 
       <!-- FOOTER -->

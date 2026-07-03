@@ -195,6 +195,127 @@ document.addEventListener("DOMContentLoaded", function () {
     },
   });
 
+  // ---------- FUNCIÓN PARA ACTUALIZAR CONSUMIDORES ----------
+  function actualizarConsumidores(consumidoresData) {
+    const lista = document.getElementById("consumidor-lista");
+    const totalSpan = document.getElementById("total-procesados");
+    
+    // Si no hay datos o es un array vacío, usar datos de ejemplo
+    if (!consumidoresData || !Array.isArray(consumidoresData) || consumidoresData.length === 0) {
+      consumidoresData = [
+        { nombre: "Consumidor 1", procesados: 5120, porcentaje: 78 },
+        { nombre: "Consumidor 2", procesados: 5115, porcentaje: 74 },
+        { nombre: "Consumidor 3", procesados: 3020, porcentaje: 45 },
+        { nombre: "Consumidor 4", procesados: 4250, porcentaje: 62 }
+      ];
+    }
+
+    let totalProcesados = 0;
+    let html = "";
+    let maxProcesados = 0;
+
+    // Calcular el máximo para los porcentajes
+    consumidoresData.forEach(consumidor => {
+      const procesados = consumidor.procesados || consumidor.escenarios || 0;
+      if (procesados > maxProcesados) {
+        maxProcesados = procesados;
+      }
+    });
+
+    // Colores para los consumidores
+    const colores = [
+      { nombre: "consumidor-1", color: "#01fbff" },
+      { nombre: "consumidor-2", color: "#00f80c" },
+      { nombre: "consumidor-3", color: "#ffbf00" },
+      { nombre: "consumidor-4", color: "#ff0b06" }
+    ];
+
+    consumidoresData.forEach((consumidor, index) => {
+      // Obtener el nombre
+      let nombre = consumidor.nombre || consumidor.consumidor || `Consumidor ${index + 1}`;
+      // Obtener los procesados
+      const procesados = consumidor.procesados || consumidor.escenarios || 0;
+      
+      totalProcesados += procesados;
+      
+      // Calcular porcentaje basado en el máximo
+      const porcentaje = maxProcesados > 0 ? (procesados / maxProcesados) * 100 : 0;
+      
+      const color = colores[index % colores.length];
+      
+      // Formatear el nombre para mostrar
+      let nombreMostrar = nombre;
+      if (nombre.startsWith('consumidor-')) {
+        nombreMostrar = `Consumidor ${nombre.split('-')[1]}`;
+      }
+      
+      html += `
+        <div class="consumidor-item">
+          <span class="consumidor-nombre ${color.nombre}">
+            <i class="fas fa-circle" style="color: ${color.color}"></i> ${nombreMostrar}
+          </span>
+          <div class="bar-wrapper">
+            <div class="bar-fill ${color.nombre}" style="width: ${porcentaje}%; background: ${color.color}"></div>
+            <span class="bar-label">${procesados.toLocaleString()}</span>
+          </div>
+        </div>
+      `;
+    });
+
+    lista.innerHTML = html;
+    totalSpan.textContent = totalProcesados.toLocaleString();
+  }
+
+  // ---------- FUNCIÓN PARA ACTUALIZAR RESULTADOS ----------
+  function actualizarResultados(resultadosData) {
+    const tabla = document.getElementById("tabla-resultados");
+    const actualizacionSpan = document.getElementById("ultima-actualizacion");
+    
+    // Si no hay datos o es un array vacío, usar datos de ejemplo
+    if (!resultadosData || !Array.isArray(resultadosData) || resultadosData.length === 0) {
+      resultadosData = [
+        { id: "#4582", marcador: "2-1", tipo: "Local" },
+        { id: "#4583", marcador: "0-2", tipo: "Visitante" },
+        { id: "#4584", marcador: "1-1", tipo: "Empate" },
+        { id: "#4585", marcador: "3-1", tipo: "Local" },
+        { id: "#4586", marcador: "2-2", tipo: "Empate" }
+      ];
+    }
+
+    let html = "";
+    resultadosData.forEach((res) => {
+      // Normalizar el tipo para la clase CSS
+      let tipoNormalizado = res.tipo.toLowerCase();
+      // Mapear tipos posibles
+      const tipoMap = {
+        'local': 'local',
+        'visitante': 'visitante',
+        'empate': 'empate',
+        'home': 'local',
+        'away': 'visitante',
+        'draw': 'empate'
+      };
+      const claseCss = tipoMap[tipoNormalizado] || tipoNormalizado;
+      
+      html += `
+        <div class="resultado-fila">
+          <span class="res-id">${res.id || '#' + Math.floor(Math.random() * 10000)}</span>
+          <span class="res-marcador">${res.marcador || '0-0'}</span>
+          <span class="res-resultado ${claseCss}">${res.tipo || 'Empate'}</span>
+        </div>
+      `;
+    });
+
+    tabla.innerHTML = html;
+
+    // Actualizar hora
+    const ahora = new Date();
+    const horas = String(ahora.getHours()).padStart(2, '0');
+    const minutos = String(ahora.getMinutes()).padStart(2, '0');
+    actualizacionSpan.textContent = `${horas}:${minutos}`;
+  }
+
+  // ---------- FUNCIÓN PRINCIPAL PARA CARGAR DATOS ----------
   async function cargarDatosDashboard() {
     try {
       const response = await fetch("/api/dashboard/");
@@ -206,6 +327,11 @@ document.addEventListener("DOMContentLoaded", function () {
       const convVisita = data.convergencia_visita || [];
       const convEmpate = data.convergencia_empate || [];
       const throughputComponentes = data.throughput_componentes || [0, 0, 0, 0];
+      
+      // Datos de consumidores - espera que vengan en la API
+      // Si no vienen, se usan los datos de ejemplo
+      const consumidores = data.consumidores || [];
+      const resultados = data.ultimos_resultados || [];
 
       // --- KPIs ---
       document.getElementById("partidos").innerText = partidos.toLocaleString();
@@ -215,7 +341,7 @@ document.addEventListener("DOMContentLoaded", function () {
       document.getElementById("throughput").innerHTML =
         `${data.throughput || 0}<small>/s</small>`;
 
-      // Pronóstico real: se deriva directamente de distribucion/partidos,
+      // Pronóstico real
       const probLocal = partidos > 0 ? (distribucion[0] / partidos) * 100 : 0;
       const probVisita = partidos > 0 ? (distribucion[1] / partidos) * 100 : 0;
       const probEmpate = partidos > 0 ? (distribucion[2] / partidos) * 100 : 0;
@@ -246,27 +372,23 @@ document.addEventListener("DOMContentLoaded", function () {
       pieChart.data.datasets[0].data = distribucion;
       pieChart.update();
 
-      // --- Últimos resultados ---
-      if (data.ultimos_resultados) {
-        const tabla = document.querySelector(".tabla-resultados");
-        tabla.innerHTML = "";
-        data.ultimos_resultados.forEach((res) => {
-          const claseCss = res.tipo.toLowerCase();
-          tabla.innerHTML += `
-            <div class="resultado-fila">
-              <span class="res-id">${res.id}</span>
-              <span class="res-marcador">${res.marcador}</span>
-              <span class="res-resultado ${claseCss}">${res.tipo}</span>
-            </div>`;
-        });
-      }
+      // --- Actualizar consumidores ---
+      actualizarConsumidores(consumidores);
+
+      // --- Actualizar últimos resultados ---
+      actualizarResultados(resultados);
+
     } catch (error) {
       console.error("Error cargando datos del dashboard:", error);
+      // Si hay error, mostrar datos de ejemplo
+      actualizarConsumidores([]);
+      actualizarResultados([]);
     }
   }
 
+  // Cargar datos inicialmente y cada 2 segundos
   cargarDatosDashboard();
-  setInterval(cargarDatosDashboard, 1000);
+  setInterval(cargarDatosDashboard, 2000);
 
   console.log(" Dashboard Montecarlo · gráficas cargadas");
 });
