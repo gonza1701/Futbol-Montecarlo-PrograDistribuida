@@ -15,7 +15,8 @@ def dashboard_api(request):
         "throughput": 0,
         "convergencia": [],
         "throughput_componentes": [0, 0, 0, 0],
-        "distribucion": [0, 0, 0]
+        "distribucion": [0, 0, 0],
+        "ultimos_resultados": []
     })
 
     return JsonResponse(data)
