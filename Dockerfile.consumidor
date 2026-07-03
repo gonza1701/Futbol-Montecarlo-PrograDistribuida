@@ -1,0 +1,16 @@
+# Dockerfile.consumidor
+FROM python:3.9-slim
+
+WORKDIR /app
+
+RUN pip install pika grpcio grpcio-tools python-dotenv
+
+# Igual que Dockerfile.productor: necesita la libreria compartida y su
+# propio codigo.
+COPY ./common /app/common
+COPY ./consumidor /app/consumidor
+
+# CONSUMIDOR_ID se pasa por variable de entorno (ver docker-compose.yml)
+# para poder levantar varias instancias con nombres distintos
+# (consumidor-1, consumidor-2, ...) sin repetir el Dockerfile.
+CMD ["python", "consumidor/Consumidor.py"]
