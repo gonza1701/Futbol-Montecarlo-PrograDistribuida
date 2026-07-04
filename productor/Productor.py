@@ -2,11 +2,9 @@ import sys
 import os
 import time
 import uuid
-
-
+import hashlib
 
 # Asegura que Python encuentre tus variables locales y la carpeta common/
-
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -16,17 +14,40 @@ from common.middleware import ConectorRabbitMQ, SerializadorProtobuf
 # Importamos las clases generadas por el compilador de protocol buffers
 import common.futbol_mensajes_pb2 as pb2
 
+# Variable global para almacenar la version actual del modelo
+VERSION_ACTUAL = None
+
+def calcular_version_modelo(modelo):
+    """Calcula una version unica para el modelo basado en su contenido"""
+    contenido = f"{modelo.id_modelo}_"
+    
+    # Ordenar las variables para consistencia
+    for nombre in sorted(modelo.variables.keys()):
+        var = modelo.variables[nombre]
+        contenido += f"{nombre}_{type(var).__name__}"
+        
+        # Anadir los parametros especificos
+        if hasattr(var, 'lambd'):
+            contenido += f"_{var.lambd}"
+        elif hasattr(var, 'mu') and hasattr(var, 'sigma'):
+            contenido += f"_{var.mu}_{var.sigma}"
+        elif hasattr(var, 'minimo') and hasattr(var, 'maximo'):
+            contenido += f"_{var.minimo}_{var.maximo}"
+    
+    return hashlib.md5(contenido.encode()).hexdigest()
+
 def ejecutar_productor_distribuido():
-    print(" Productor: Inicializando nodo emisor de simulación...")
+    global VERSION_ACTUAL
+    
+    print(" Productor: Inicializando nodo emisor de simulacion...")
 
     #conexion a rabbitmq
-
     try:
         conector = ConectorRabbitMQ()
-        print("Conexión establecida con RabbitMQ con éxito.")
+        print("Conexion establecida con RabbitMQ con exito.")
     except Exception as e:
-        print(f" Error crítico al conectar a RabbitMQ: {e}")
-        print("Revisa que el contenedor Docker esté encendido y el .env configurado.")
+        print(f" Error critico al conectar a RabbitMQ: {e}")
+        print("Revisa que el contenedor Docker este encendido y el .env configurado.")
         return
 
     # Carga el parser y el modelo base desde el archivo de texto
@@ -40,15 +61,22 @@ def ejecutar_productor_distribuido():
         return
 
     try:
-        # Limpiamos los mensajes anteriores 
+        # Calcular la version del modelo actual
+        nueva_version = calcular_version_modelo(modelo)
+        VERSION_ACTUAL = nueva_version
+        print(f"Version del modelo: {VERSION_ACTUAL[:8]}...")
+        
+        # Limpiamos los mensajes anteriores de AMBAS colas
         conector.purgar_cola('cola_modelo')
+        conector.purgar_cola('cola_escenarios')
+        print("Colas limpiadas para nuevo modelo.")
         
         # Instanciar la clase definida en el .proto para el contrato de modelo
         msg_modelo = pb2.ModeloFutbol()
         msg_modelo.id_modelo = modelo.id_modelo
         msg_modelo.formula_evaluacion = "evaluacion_montecarlo_basica"
         
-        # Construimos la estructura repetida con el bloque oneof para cada distribución
+        # Construimos la estructura repetida con el bloque oneof para cada distribucion
         for nombre, var in modelo.variables.items():
             var_proto = pb2.VariableAleatoria()
             var_proto.nombre = nombre
@@ -68,7 +96,7 @@ def ejecutar_productor_distribuido():
                 
             msg_modelo.variables.append(var_proto)
 
-        # Serializamos usando el metodo estático  
+        # Serializamos usando el metodo estatico  
         payload_modelo_binario = SerializadorProtobuf.serializar(msg_modelo)
         
         # metodo publicar en la cola de RabbitMQ
@@ -80,14 +108,14 @@ def ejecutar_productor_distribuido():
         print("Saltando directo al bucle de escenarios continuos...")
 
     # 
-    # Bucle de simulacion (Modelo montecarlo) para generar escenarios de partidos de fútbol
+    # Bucle de simulacion (Modelo montecarlo) para generar escenarios de partidos de futbol
     
-    print("\nIniciando flujo continuo de escenarios. Presiona Ctrl+C para detener la ráfaga.")
+    print("\nIniciando flujo continuo de escenarios. Presiona Ctrl+C para detener la rafaga.")
     total_enviados = 0
     
     try:
         while True:
-            # Generación de identificador único global para el escenario
+            # Generacion de identificador unico global para el escenario
             id_escenario = str(uuid.uuid4())
             
             # Motor matematico generando muestras aleatorias para el escenario de partido
@@ -97,14 +125,14 @@ def ejecutar_productor_distribuido():
             msg_escenario = pb2.EscenarioPartido()
             msg_escenario.id_escenario = id_escenario
             
-            #Asignacion de las variables generadas por el motor matemático a los campos del mensaje Protobuf
+            #Asignacion de las variables generadas por el motor matematico a los campos del mensaje Protobuf
             msg_escenario.t_gol_local = valores.get('t_gol_local', 0.0)
             msg_escenario.t_gol_visitante = valores.get('t_gol_visitante', 0.0)
             msg_escenario.rendimiento_local = valores.get('rendimiento_local', 0.0)
             msg_escenario.rendimiento_visitante = valores.get('rendimiento_visitante', 0.0)
             msg_escenario.factor_var = valores.get('factor_var', 0.0)
             
-            # serializamos el mensaje de escenario usando el método estático de SerializadorProtobuf
+            # serializamos el mensaje de escenario usando el metodo estatico de SerializadorProtobuf
             payload_binario = SerializadorProtobuf.serializar(msg_escenario)
             
             # metodo publicar 
@@ -112,17 +140,17 @@ def ejecutar_productor_distribuido():
             
             total_enviados += 1
             if total_enviados % 1000 == 0:
-                print(f"Estatus: {total_enviados} escenarios continuos inyectados con éxito...")
+                print(f"Estatus: {total_enviados} escenarios continuos inyectados con exito (v{VERSION_ACTUAL[:8]})...")
             
             # Pausa de control de flujo para regular los sockets de red (1 milisegundo)
             time.sleep(0.001)
 
     except KeyboardInterrupt:
-        print("\nTransmisión pausada por el operador (Productor detenido manualmente).")
+        print("\nTransmision pausada por el operador (Productor detenido manualmente).")
     finally:
-        # Cierre seguro del canal y conexión a la red 
+        # Cierre seguro del canal y conexion a la red 
         conector.cerrar()
-        print("Conexión con RabbitMQ liberada de forma segura.")
+        print("Conexion con RabbitMQ liberada de forma segura.")
 
 if __name__ == "__main__":
     ejecutar_productor_distribuido()
